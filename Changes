@@ -1,0 +1,6 @@
+Changes
+=======
+
+0.01
+    - Rename from ZMQ::CZMQ to ZMQ::LibCZMQ1
+
