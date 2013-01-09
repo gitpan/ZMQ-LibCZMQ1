@@ -3,6 +3,17 @@
 #include "XSUB.h"
 #include "perl_czmq.h"
 
+#define PerlLibczmq1_function_unavailable(name) \
+    { \
+        int major, minor, patch; \
+        zmq_version(&major, &minor, &patch); \
+        croak("%s is not available in this version of libczmq (%d.%d.%d)", name, \
+                CZMQ_VERSION_MAJOR, \
+                CZMQ_VERSION_MINOR, \
+                CZMQ_VERSION_PATCH \
+        ); \
+    }
+
 STATIC_INLINE
 int
 PerlLibCZMQ1_zctx_mg_free(pTHX_ SV * const sv, MAGIC *const mg ) {
@@ -70,6 +81,31 @@ PerlLibCZMQ1_zmsg_mg_free(pTHX_ SV * const sv, MAGIC *const mg) {
 MODULE = ZMQ::LibCZMQ1  PACKAGE = ZMQ::LibCZMQ1 
 
 PROTOTYPES: DISABLE
+
+void
+zmq_version()
+    PREINIT:
+        I32 gimme;
+    PPCODE:
+        gimme = GIMME_V;
+        if (gimme == G_VOID) {
+            XSRETURN(0);
+        }
+
+        if (gimme == G_SCALAR) {
+            XPUSHs(sv_2mortal(newSVpvf(
+                "%d.%d.%d",
+                ZMQ_VERSION_MAJOR,
+                ZMQ_VERSION_MINOR,
+                ZMQ_VERSION_PATCH
+            )));
+            XSRETURN(1);
+        } else {
+            mXPUSHi(ZMQ_VERSION_MAJOR);
+            mXPUSHi(ZMQ_VERSION_MINOR);
+            mXPUSHi(ZMQ_VERSION_PATCH);
+            XSRETURN(3);
+        }
 
 void
 czmq_version()
@@ -213,12 +249,18 @@ int  zsocket_fd (socket)
 int  zsocket_linger (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
 
-int  zsocket_maxmsgsize (socket)
+int
+zsocket_maxmsgsize (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
-    PREINIT:
-#ifndef zsocket_maxmsgsize
-        croak( "zsocket_maxmsgsize is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_MAXMSGSIZE
+        PERL_UNUSED_VAR(socket);
+        PerlLibczmq1_function_unavailable("zsocket_maxmsgsize");
+#else
+        RETVAL = zsocket_maxmsgsize(socket);
 #endif
+    OUTPUT:
+        RETVAL
 
 int  zsocket_rate (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
@@ -226,12 +268,18 @@ int  zsocket_rate (socket)
 int  zsocket_rcvbuf (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
 
-int  zsocket_rcvhwm (socket)
+int
+zsocket_rcvhwm (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
-    PREINIT:
-#ifndef zsocket_rcvhwm
-        croak( "zsocket_rcvhwm is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_RCVHWM
+        PERL_UNUSED_VAR(socket);
+        PerlLibczmq1_function_unavailable("zsocket_rcvhwm");
+#else
+        RETVAL = zsocket_rcvhwm(socket);
 #endif
+    OUTPUT:
+        RETVAL
 
 int  zsocket_rcvmore (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
@@ -248,12 +296,18 @@ int  zsocket_recovery_ivl (socket)
 int  zsocket_sndbuf (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
 
-int  zsocket_sndhwm (socket)
+int
+zsocket_sndhwm (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
-    PREINIT:
-#ifndef zsocket_sndhwm
-        croak( "zsocket_sndhwm is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_SNDHWM
+        PERL_UNUSED_VAR(socket);
+        PerlLibczmq1_function_unavailable("zsocket_sndhwm");
+#else
+        RETVAL = zsocket_sndhwm(socket);
 #endif
+    OUTPUT:
+        RETVAL
 
 int  zsocket_type (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
@@ -261,20 +315,30 @@ int  zsocket_type (socket)
 int  zsocket_events (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
 
-void zsocket_set_sndhwm (socket, sndhwm)
+void
+zsocket_set_sndhwm (socket, sndhwm)
         PerlLibCZMQ1_zsocket_raw *socket;
         int sndhwm;
-    PREINIT:
-#ifndef zsocket_set_sndhwm
-        croak( "zsocket_set_sndhwm is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_SET_SNDHWM
+        PERL_UNUSED_VAR(socket);
+        PERL_UNUSED_VAR(sndhwm);
+        PerlLibczmq1_function_unavailable("zsocket_set_sndhwm");
+#else
+        zsocket_set_sndhwm(socket, sndhwm);
 #endif
 
-void zsocket_set_rcvhwm (socket, rcvhwm)
+void
+zsocket_set_rcvhwm (socket, rcvhwm)
         PerlLibCZMQ1_zsocket_raw *socket;
         int rcvhwm;
-    PREINIT:
-#ifndef zsocket_set_rcvhwm
-        croak( "zsocket_set_rcvhwm is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_SET_RCVHWM
+        PERL_UNUSED_VAR(socket);
+        PERL_UNUSED_VAR(rcvhwm);
+        PerlLibczmq1_function_unavailable("zsocket_set_rcvhwm");
+#else
+        zsocket_set_rcvhwm(socket, rcvhwm);
 #endif
 
 void zsocket_set_affinity (socket, affinity)
@@ -317,12 +381,17 @@ void zsocket_set_reconnect_ivl_max (socket, reconnect_ivl_max)
         PerlLibCZMQ1_zsocket_raw *socket;
         int reconnect_ivl_max;
 
-void zsocket_set_maxmsgsize (socket, maxmsgsize)
+void
+zsocket_set_maxmsgsize (socket, maxmsgsize)
         PerlLibCZMQ1_zsocket_raw *socket;
         int maxmsgsize;
-    PREINIT:
-#ifndef zsocket_set_maxmsgsize
-        croak( "zsocket_set_maxmsgsize is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_SET_MAXMSGSIZE
+        PERL_UNUSED_VAR(socket);
+        PERL_UNUSED_VAR(maxmsgsize);
+        PerlLibczmq1_function_unavailable("zsocket_set_maxmsgsize");
+#else
+        zsocket_set_maxmsgsize(socket, maxmsgsize);
 #endif
 
 void zsocket_set_subscribe (socket, subscribe)
@@ -336,66 +405,97 @@ void zsocket_set_unsubscribe (socket, unsubscribe)
 void zsocket_set_hwm (socket, hwm)
         PerlLibCZMQ1_zsocket_raw *socket;
         int hwm;
-    PREINIT:
-#ifndef zsocket_set_hwm
-        PERL_UNUSED_VAR(hwm);
-        croak( "zsocket_set_hwm is not available in this version of czmq" );
-#endif
 
-void zsocket_set_recovery_ivl_msec (socket, recovery_ivl_msec)
+void
+zsocket_set_recovery_ivl_msec (socket, recovery_ivl_msec)
         PerlLibCZMQ1_zsocket_raw *socket;
         int recovery_ivl_msec;
-    PREINIT:
-#ifndef zsocket_set_recovery_ivl_msec
+    CODE:
+#ifndef HAS_ZSOCKET_SET_RECOVERY_IVL_MSEC
+        PERL_UNUSED_VAR(socket);
         PERL_UNUSED_VAR(recovery_ivl_msec);
-        croak( "zsocket_set_recovery_ivl_msec is not available in this version of czmq" );
-#endif zsocket_set_recovery_ivl_msec
-
-int  zsocket_swap (socket)
-        PerlLibCZMQ1_zsocket_raw *socket;
-    PREINIT:
-#ifndef zsocket_swap
-        croak( "zsocket_swap is not available in this version of czmq" );
+        PerlLibczmq1_function_unavailable("zsocket_set_recovery_ivl_msec");
+#else
+        zsocket_set_recovery_ivl_msec(socket, recovery_ivl_msec);
 #endif
 
-int  zsocket_mcast_loop (socket)
+int
+zsocket_swap (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
-    PREINIT:
-#ifndef zsocket_mcast_loop
-        croak( "zsocket_mcast_loop is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_SWAP
+        PERL_UNUSED_VAR(socket);
+        PerlLibczmq1_function_unavailable("zsocket_swap");
+#else
+        RETVAL = zsocket_swap(socket);
 #endif
+    OUTPUT:
+        RETVAL
 
-int  zsocket_hwm (socket)
+int
+zsocket_mcast_loop (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
-    PREINIT:
-#ifndef zsocket_hwm
-        croak( "zsocket_hwm is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_MCAST_LOOP
+        PERL_UNUSED_VAR(socket);
+        PerlLibczmq1_function_unavailable("zsocket_mcast_loop");
+#else
+        RETVAL = zsocket_mcast_loop(socket);
 #endif
+    OUTPUT:
+        RETVAL
 
-void zsocket_set_mcast_loop (socket, mcast_loop)
+int
+zsocket_hwm (socket)
+        PerlLibCZMQ1_zsocket_raw *socket;
+    CODE:
+#ifndef HAS_ZSOCKET_HWM
+        PERL_UNUSED_VAR(socket);
+        PerlLibczmq1_function_unavailable("zsocket_hwm");
+#else
+        RETVAL = zsocket_hwm(socket);
+#endif
+    OUTPUT:
+        RETVAL
+
+void
+zsocket_set_mcast_loop (socket, mcast_loop)
         PerlLibCZMQ1_zsocket_raw *socket;
         int mcast_loop;
-    PREINIT:
-#ifndef zsocket_set_mcast_loop
+    CODE:
+#ifndef HAS_ZSOCKET_SET_MCAST_LOOP
+        PERL_UNUSED_VAR(socket);
         PERL_UNUSED_VAR(mcast_loop);
-        croak( "zsocket_set_mcast_loop is not available in this version of czmq" );
+        PerlLibczmq1_function_unavailable("zsocket_set_mcast_loop");
+#else
+        zsocket_set_mcast_loop(socket, mcast_loop);
 #endif
 
-void zsocket_set_swap (socket, swap)
+void
+zsocket_set_swap (socket, swap)
         PerlLibCZMQ1_zsocket_raw *socket;
         int swap;
-    PREINIT:
-#ifndef zsocket_set_sawp
+    CODE:
+#ifndef HAS_ZSOCKET_SET_SWAP
+        PERL_UNUSED_VAR(socket);
         PERL_UNUSED_VAR(swap);
-        croak( "zsocket_set_swap is not available in this version of czmq" );
+        PerlLibczmq1_function_unavailable("zsocket_set_swap");
+#else
+        zsocket_set_swap(socket, swap);
 #endif
 
-int  zsocket_recovery_ivl_msec (socket)
+int
+zsocket_recovery_ivl_msec (socket)
         PerlLibCZMQ1_zsocket_raw *socket;
-    PREINIT:
-#ifndef zsocket_recovery_ivl_msec
-        croak( "zsocket_recovery_ivl_msec is not available in this version of czmq" );
+    CODE:
+#ifndef HAS_ZSOCKET_RECOVERY_IVL_MSEC
+        PERL_UNUSED_VAR(socket);
+        PerlLibczmq1_function_unavailable("zsocket_recovery_ivl_msec");
+#else
+        RETVAL = zsocket_recovery_ivl_msec(socket);
 #endif
+    OUTPUT:
+        RETVAL
 
 char *
 zstr_recv(socket)
@@ -519,17 +619,6 @@ zframe_reset(frame, data, size)
 int
 zframe_zero_copy(frame)
         PerlLibCZMQ1_zframe *frame;
-    CODE:
-#ifdef zframe_zero_copy
-        RETVAL = zframe_zero_copy(frame);
-#else
-        PERL_UNUSED_VAR(frame);
-        {
-            croak("zframe_zero_copy is not available in this version of libczmq (%d.%d.%d)", CZMQ_VERSION_MAJOR, CZMQ_VERSION_MINOR, CZMQ_VERSION_PATCH);
-        }
-#endif
-    OUTPUT:
-        RETVAL
 
 PerlLibCZMQ1_zmsg *
 zmsg_new()
@@ -577,21 +666,10 @@ size_t
 zmsg_content_size(msg)
         PerlLibCZMQ1_zmsg *msg;
 
-#ifdef CZMQ_VOID_RETURN_VALUES
-
-void
-zmsg_push(msg, frame)
-        PerlLibCZMQ1_zmsg *msg;
-        PerlLibCZMQ1_zframe *frame;
-
-#else
-
 int
 zmsg_push(msg, frame)
         PerlLibCZMQ1_zmsg *msg;
         PerlLibCZMQ1_zframe *frame;
-
-#endif
 
 PerlLibCZMQ1_zframe *
 zmsg_pop(msg)
@@ -599,27 +677,6 @@ zmsg_pop(msg)
     PREINIT:
         SV *class_sv = sv_2mortal(newSVpv("ZMQ::LibCZMQ1::Zmsg", 0));
 
-#ifdef CZMQ_VOID_RETURN_VALUES
-
-void
-zmsg_add(msg, frame)
-        PerlLibCZMQ1_zmsg *msg;
-        PerlLibCZMQ1_zframe *frame;
-
-void
-zmsg_pushmem(msg, src, size)
-        PerlLibCZMQ1_zmsg *msg;
-        const void *src;
-        size_t size;
-
-void
-zmsg_addmem(msg, src, size)
-        PerlLibCZMQ1_zmsg *msg;
-        const void *src;
-        size_t size;
-
-#else
-
 int
 zmsg_add(msg, frame)
         PerlLibCZMQ1_zmsg *msg;
@@ -636,8 +693,6 @@ zmsg_addmem(msg, src, size)
         PerlLibCZMQ1_zmsg *msg;
         const void *src;
         size_t size;
-
-#endif
 
 char *
 zmsg_popstr(msg)

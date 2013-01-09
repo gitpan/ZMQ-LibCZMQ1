@@ -17,13 +17,15 @@ MYMETA.json
 src/perl_czmq.h
 src/perl_czmq.xs
 src/typemap
+t/000_compile.t
 t/001_zctx.t
 t/002_zsocket.t
 t/003_zframe.t
 t/004_zmsg.t
-tools/detect.pl
+tools/detect_czmq.pl
+tools/detect_zmq.pl
 tools/genfiles.pl
+tools/zmqcheck/Makefile.PL
 xt/999_leak.t
 xt/999_pod-coverage.t
 xt/999_pod.t
-zmqinfo.c

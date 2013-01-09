@@ -4,7 +4,7 @@ use Exporter 'import';
 use XSLoader;
 our $VERSION;
 BEGIN {
-    $VERSION = '0.01';
+    $VERSION = '0.02';
     XSLoader::load(__PACKAGE__, $VERSION);
 }
 
@@ -128,7 +128,7 @@ our %EXPORT_TAGS = (
         zframe_strhex
     ) ],
 );
-our @EXPORT_OK = map { @$_ } values %EXPORT_TAGS;
+our @EXPORT = map { @$_ } values %EXPORT_TAGS;
 
 sub zstr_send {
     my ($socket, $message, @args) = @_;
@@ -192,9 +192,40 @@ patches are welcome)
 This module is still in heavey development. Please send issues, patches and pull 
 requests if you have problems.
 
+=head1 INSTALLATION
+
+You need to make sure that BOTH libzmq and libczmq files are searchable when
+the compilation happens: Consider this case: you have zeromq-2.x in 
+/usr/local, but you want to build against a custom zeromq-3.x in /path/to/app.
+If you don't specify anything, your compiler will look find zeromq-2.x in the
+standard location (/usr/local) and not the custom one.
+
+If you installed your libraries with pkg-config data, then our scripts should
+be able to detect them automatically (but of course, you still need to
+make sure that zeromq-3.x files are found before zeromq-2.x files in the
+above scenario). Otherwise, use ZMQ_HOME and CZMQ_HOME environment
+variables:
+
+    ZMQ_HOME=/path/to/zeromq \
+    CZMQ_HOME=/path/to/czmq \
+        perl Makefile.PL
+    make
+    make test
+    make install
+
 =head1 FUNCTIONS
 
+=head2 zmq_version()
+
+Returns the version of libzmq this czmq (and hence this module) is built against.
+
+In list context, returns 3 elements consisting of major version, minor version, and patch version.
+
+In scalar context returns dotted version string.
+
 =head2 czmq_version()
+
+Returns the version of czmq this module is built against.
 
 In list context, returns 3 elements consisting of major version, minor version, and patch version.
 
@@ -326,7 +357,7 @@ In scalar context returns dotted version string.
 
 =head2 zsocket_rcvbuf
 
-=head2 zsocket_rcvhwm
+=head2 zsocket_rcvhwm (only for libzmq 3.x)
 
 =head2 zsocket_rcvmore
 
@@ -336,7 +367,7 @@ In scalar context returns dotted version string.
 
 =head2 zsocket_recovery_ivl
 
-=head2 zsocket_recovery_ivl_msec
+=head2 zsocket_recovery_ivl_msec (only for libzmq 2.x)
 
 =head2 zsocket_set_affinity
 
@@ -348,7 +379,7 @@ In scalar context returns dotted version string.
 
 =head2 zsocket_set_linger
 
-=head2 zsocket_set_maxmsgsize
+=head2 zsocket_set_maxmsgsize (only for libzmq 3.x)
 
 =head2 zsocket_set_mcast_loop (only in libzmq 2.x)
 
@@ -356,7 +387,7 @@ In scalar context returns dotted version string.
 
 =head2 zsocket_set_rcvbuf
 
-=head2 zsocket_set_rcvhwm
+=head2 zsocket_set_rcvhwm (only for libzmq 3.x)
 
 =head2 zsocket_set_reconnect_ivl
 
