@@ -1,11 +1,9 @@
 ---
 abstract: 'Wrapper Around czmq high level ZMQ API'
 build_requires:
-  Devel::CheckLib: 0.4
   Devel::PPPort: 3.19
   ExtUtils::MakeMaker: 6.36
 configure_requires:
-  Devel::CheckLib: 0.4
   Devel::PPPort: 3.19
   ExtUtils::MakeMaker: 6.36
   ExtUtils::ParseXS: 2.21
@@ -25,4 +23,8 @@ no_index:
 requires:
   XSLoader: 0.02
   ZMQ::Constants: 0
-version: 0.02
+resources:
+  bugtracker: https://github.com/lestrrat/p5-ZMQ/issues
+  homepage: https://github.com/lestrrat/p5-ZMQ
+  repository: git://github.com/lestrrat/p5-ZMQ.git
+version: 0.03
