@@ -23,7 +23,6 @@ t/003_zframe.t
 t/004_zmsg.t
 tools/detect_czmq.pl
 tools/detect_zmq.pl
-tools/gen_versioned.pl
 tools/genfiles.pl
 tools/zmqcheck/Makefile.PL
 xt/999_leak.t

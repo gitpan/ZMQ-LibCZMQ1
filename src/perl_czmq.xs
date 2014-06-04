@@ -204,7 +204,7 @@ zsocket_destroy( ctx, socket )
             }
         }
 
-char *
+const char *
 zsocket_type_str( socket )
         PerlLibCZMQ1_zsocket_raw *socket;
 
@@ -213,7 +213,7 @@ _zsocket_bind( socket, address )
         PerlLibCZMQ1_zsocket_raw *socket;
         const char *address;
     CODE:
-        RETVAL = zsocket_bind( socket, address );
+        RETVAL = zsocket_bind( socket, "%s", address );
     OUTPUT:
         RETVAL
 
@@ -228,11 +228,11 @@ _zsocket_connect( socket, address )
         /* XXX czmq 1.1.0 defines this as void, where as 1.2.0 declares
            it as int. We're not supporting old czmq
         */
-        RETVAL = zsocket_connect( socket, address );
+        RETVAL = zsocket_connect( socket, "%s", address );
     OUTPUT:
         RETVAL
 
-Bool
+bool
 zsocket_poll( socket, msecs)
         PerlLibCZMQ1_zsocket_raw *socket;
         int msecs;
@@ -591,7 +591,7 @@ char *
 zframe_strdup(frame)
         PerlLibCZMQ1_zframe *frame;
 
-Bool
+bool
 zframe_streq(frame, string)
         PerlLibCZMQ1_zframe *frame;
         char *string;
@@ -600,7 +600,7 @@ int
 zframe_more(frame)
         PerlLibCZMQ1_zframe *frame;
 
-Bool
+bool
 zframe_eq(self, other)
         PerlLibCZMQ1_zframe *self;
         PerlLibCZMQ1_zframe *other;
